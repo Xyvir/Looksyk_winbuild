@@ -29,7 +29,10 @@ use actix_web::web::{Data, Json};
 use actix_web::{error, get, post, Error, HttpRequest, Responder};
 use mime::Mime;
 use std::fs;
+#[cfg(unix)]
 use std::os::unix::fs::MetadataExt;
+#[cfg(windows)]
+use std::os::windows::fs::MetadataExt;
 use std::path::Path;
 use std::str::FromStr;
 
@@ -111,11 +114,18 @@ pub async fn get_metadata(req: HttpRequest, data: Data<AppState>) -> error::Resu
         )));
     }
     let metadata = read_metadata(path);
-    let size = metadata.size();
-    let last_modified = metadata.mtime();
+    #[cfg(unix)]
+    let (size, last_modified) = (metadata.size(), metadata.mtime());
+    #[cfg(windows)]
+    let (size, last_modified) = (
+        metadata.file_size(),
+        (metadata.last_write_time() / 10_000_000) - 11_644_473_600,
+    );
+    #[cfg(not(any(unix, windows)))]
+    let (size, last_modified) = (metadata.len(), 0); // Fallback for other platforms
 
     Ok(Json(map_markdown_file_to_dto(
-        render_file_flat(&get_asset_meta_info_table(size, last_modified)),
+        render_file_flat(&get_asset_meta_info_table(size as u64, last_modified as i64)),
         false,
     )))
 }
