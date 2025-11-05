@@ -1,6 +1,7 @@
 name: Release Windows Installer
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
@@ -23,9 +24,13 @@ jobs:
         run: |
           bash build.sh
 
-      - name: Make Windows installer (unsigned)
+      - name: Make Windows installer
+        env:
+          # This secret should be configured in your repository settings
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
         run: |
           cd application-wrapper/Looksyk
+          npm install --save-dev @electron-forge/maker-squirrel
           npm run make -- --platform=win32 --arch=x64
 
       - name: Upload Windows Installer to Release
