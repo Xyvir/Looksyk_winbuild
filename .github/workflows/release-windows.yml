@@ -27,7 +27,7 @@ jobs:
 
       - name: Build frontend
         shell: bash
-        working-directory: frontend/looksyk
+        working-directory: frontend\looksyk
         run: |
           npm install
           npm run build --configuration=production
@@ -38,7 +38,7 @@ jobs:
 
       - name: Package application wrapper
         shell: bash
-        working-directory: application-wrapper/Looksyk
+        working-directory: application-wrapper\Looksyk
         run: |
           npm install
           npm run package
