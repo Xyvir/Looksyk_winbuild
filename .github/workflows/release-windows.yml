@@ -1,0 +1,37 @@
+name: Release Windows Installer
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-windows-installer:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Install dependencies and build project
+        run: |
+          bash build.sh
+
+      - name: Make Windows installer (unsigned)
+        run: |
+          cd application-wrapper/Looksyk
+          npm run make -- --platform=win32 --arch=x64
+
+      - name: Upload Windows Installer to Release
+        run: |
+          $release_tag = "${{ github.ref_name }}"
+          $asset_path = "application-wrapper/Looksyk/out/make/squirrel.windows/x64/*"
+          Get-ChildItem -Path $asset_path | ForEach-Object { gh release upload $release_tag $_.FullName --clobber }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
