@@ -38,8 +38,8 @@ jobs:
 
       - name: Package application wrapper
         shell: bash
-        working-directory: application-wrapper\Looksyk
         run: |
+          cd application-wrapper/Looksyk
           npm install
           npm run package
 
