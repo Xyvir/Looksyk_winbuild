@@ -20,9 +20,50 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - name: Install dependencies and build project
+      - name: Cache cargo dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          working-directory: backend
+
+      - name: Build frontend
+        shell: bash
+        working-directory: frontend/looksyk
         run: |
-          bash build.sh
+          npm install
+          npm run build --configuration=production
+
+      - name: Build backend
+        working-directory: backend
+        run: cargo build --release
+
+      - name: Package application wrapper
+        shell: bash
+        working-directory: application-wrapper/Looksyk
+        run: |
+          npm install
+          npm run package
+
+      - name: Create target directory and copy artifacts
+        shell: bash
+        run: |
+          echo "delete old target"
+          rm -rf target
+          echo "old target deleted"
+          echo "creating new target"
+          mkdir -p target
+          cp backend/target/release/looksyk.exe target/
+          mkdir -p target/static
+          cp -rf frontend/looksyk/dist/looksyk/browser/* target/static
+          mkdir -p target/application-wrapper
+          if [ -d "application-wrapper/Looksyk/out/looksyk-win32-x64" ]; then
+            cp -r application-wrapper/Looksyk/out/looksyk-win32-x64/* target/application-wrapper
+          else
+            echo "Warning: could not find application-wrapper/Looksyk/out/looksyk-win32-x64"
+            # for debugging, list the contents of the out directory
+            ls -l application-wrapper/Looksyk/out
+          fi
+          echo "done"
+
 
       - name: Make Windows installer
         env:
