@@ -35,14 +35,15 @@ jobs:
         working-directory: ./backend
         run: cargo build --release
 
+      - name: Debug directory structure
+        run: |
+          Write-Host "--- Debug: Listing repository root content ---"
+          Get-ChildItem -Path . -Depth 2
+          Write-Host "--- End of debug output ---"
+
       - name: Package application wrapper
         working-directory: application-wrapper/Looksyk
         run: |
-          Write-Host "--- Debug: Listing current directory ($PWD) ---"
-          Get-ChildItem
-          Write-Host "--- Debug: Listing parent 'application-wrapper' directory (..) ---"
-          Get-ChildItem ..
-          Write-Host "--- End of debug output ---"
           if (Test-Path -Path "out") { Remove-Item -Recurse -Force "out" }
           npm install
           npm run package
