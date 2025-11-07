@@ -74,7 +74,13 @@ jobs:
 
       - name: Upload Windows Installer to Release
         run: |
-          $release_tag = "${{ github.ref_name }}"
+          if ("${{ github.event_name }}" -eq "release") {
+            $release_tag = "${{ github.ref_name }}"
+          } else {
+            $release_tag = "win-$(Get-Date -UFormat '%Y%m%d-%H%M%S')"
+            gh release create $release_tag --generate-notes --title "Windows Build $release_tag"
+          }
+
           $asset_path = "application-wrapper/Looksyk/out/make/squirrel.windows/x64/*"
           Get-ChildItem -Path $asset_path | ForEach-Object { gh release upload $release_tag $_.FullName --clobber }
         env:
