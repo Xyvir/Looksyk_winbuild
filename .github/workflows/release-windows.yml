@@ -26,43 +26,40 @@ jobs:
           working-directory: backend
 
       - name: Build frontend
-        shell: bash
-        working-directory: frontend\looksyk
+        working-directory: frontend/looksyk
         run: |
           npm install
           npm run build --configuration=production
 
       - name: Build backend
-        working-directory: backend
+        working-directory: ./backend
         run: cargo build --release
 
       - name: Package application wrapper
-        shell: bash
+        working-directory: application-wrapper/Looksyk
         run: |
-          cd application-wrapper/Looksyk
+          Write-Host "--- Debug: Listing current directory ($PWD) ---"
+          Get-ChildItem
+          Write-Host "--- Debug: Listing parent 'application-wrapper' directory (..) ---"
+          Get-ChildItem ..
+          Write-Host "--- End of debug output ---"
+          if (Test-Path -Path "out") { Remove-Item -Recurse -Force "out" }
           npm install
           npm run package
 
       - name: Create target directory and copy artifacts
-        shell: bash
         run: |
-          echo "delete old target"
-          rm -rf target
-          echo "old target deleted"
-          echo "creating new target"
-          mkdir -p target
-          cp backend/target/release/looksyk.exe target/
-          mkdir -p target/static
-          cp -rf frontend/looksyk/dist/looksyk/browser/* target/static
-          mkdir -p target/application-wrapper
+          if (Test-Path -Path "target") { Remove-Item -Recurse -Force "target" }
+          New-Item -ItemType Directory -Force -Path "target/static"
+          New-Item -ItemType Directory -Force -Path "target/application-wrapper"
+          Copy-Item -Path "backend/target/release/looksyk.exe" -Destination "target/"
+          Copy-Item -Path "frontend/looksyk/dist/looksyk/browser/*" -Destination "target/static" -Recurse
           if [ -d "application-wrapper/Looksyk/out/looksyk-win32-x64" ]; then
-            cp -r application-wrapper/Looksyk/out/looksyk-win32-x64/* target/application-wrapper
+            Copy-Item -Path "application-wrapper/Looksyk/out/looksyk-win32-x64/*" -Destination "target/application-wrapper" -Recurse
           else
-            echo "Warning: could not find application-wrapper/Looksyk/out/looksyk-win32-x64"
-            # for debugging, list the contents of the out directory
-            ls -l application-wrapper/Looksyk/out
+            Write-Warning "Could not find 'application-wrapper/Looksyk/out/looksyk-win32-x64'"
+            Get-ChildItem -Path "application-wrapper/Looksyk/out" -Recurse
           fi
-          echo "done"
 
 
       - name: Make Windows installer
