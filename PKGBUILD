@@ -58,7 +58,7 @@ package() {
 	install -D -m644 "application-wrapper/Looksyk.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
 
 	install -D -m755 "backend/target/release/looksyk" "${pkgdir}/usr/lib/${_pkgnameshort}/looksyk-backend"
-	install -D -m755 "application-wrapper/looksyk" "${pkgdir}/usr/lib/${_pkgnameshort}/looksyk"
+	install -D -m755 "application-wrapper/looksyk.sh" "${pkgdir}/usr/lib/${_pkgnameshort}/looksyk"
 	
 	ln -s "/usr/lib/${_pkgnameshort}/looksyk-backend" "${pkgdir}/usr/bin/looksyk-backend"
 	ln -s "/usr/lib/${_pkgnameshort}/looksyk" "${pkgdir}/usr/bin/looksyk"

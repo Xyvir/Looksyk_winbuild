@@ -26,5 +26,7 @@ mkdir -p target/static
 cp -rf frontend/looksyk/dist/looksyk/browser/* target/static
 mkdir -p target/application-wrapper
 cp -r application-wrapper/Looksyk/out/looksyk-linux-x64/* target/application-wrapper
+cp application-wrapper/looksyk.sh target/application-wrapper/looksyk.sh
+chmod +x target/application-wrapper/looksyk.sh
 
 echo "done";
