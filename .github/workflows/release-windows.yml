@@ -55,12 +55,12 @@ jobs:
           New-Item -ItemType Directory -Force -Path "target/application-wrapper"
           Copy-Item -Path "backend/target/release/looksyk.exe" -Destination "target/"
           Copy-Item -Path "frontend/looksyk/dist/looksyk/browser/*" -Destination "target/static" -Recurse
-          if [ -d "application-wrapper/Looksyk/out/looksyk-win32-x64" ]; then
+          if (Test-Path -Path "application-wrapper/Looksyk/out/looksyk-win32-x64") {
             Copy-Item -Path "application-wrapper/Looksyk/out/looksyk-win32-x64/*" -Destination "target/application-wrapper" -Recurse
-          else
+          } else {
             Write-Warning "Could not find 'application-wrapper/Looksyk/out/looksyk-win32-x64'"
             Get-ChildItem -Path "application-wrapper/Looksyk/out" -Recurse
-          fi
+          }
 
 
       - name: Make Windows installer
