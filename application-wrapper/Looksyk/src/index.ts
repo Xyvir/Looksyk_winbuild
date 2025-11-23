@@ -3,6 +3,8 @@ import { spawn } from 'child_process';
 import { BehaviorSubject, filter, firstValueFrom, identity } from "rxjs";
 import { ArgumentConfig, parse } from "ts-command-line-args";
 
+app.commandLine.appendSwitch('no-disk-cache');
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 //eslint-disable-next-line @typescript-eslint/no-require-imports
 if (require('electron-squirrel-startup')) {
